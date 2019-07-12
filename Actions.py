@@ -1,5 +1,5 @@
 from Action import Action
-
+from DateTime import DateTime
 
 class Actions:
     def __init__(self):
@@ -18,6 +18,8 @@ class Actions:
             self.single_acts.append(some_action)
 
     def get_list_from_to(self, start_time, end_time):
+        start_time = DateTime(start_time)
+        end_time = DateTime(end_time)
         res = []
         for i in self.single_acts:
             if (i.start_time > start_time) and (i.start_time < end_time):
