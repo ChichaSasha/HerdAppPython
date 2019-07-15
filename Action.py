@@ -1,32 +1,40 @@
-from DateTime import *
-
-global_id = 101
-
+import datetime
+from errors import *
 
 class Action:
-    def __init__(self, name, id, description, start_time, days_counter):
-        self.name = name
+    def __init__(self, id, name, description, start_time, days_counter):
         self.id = id
+        self.name = name
         self.description = description
         self.start_time = start_time
         self.days_counter = days_counter
 
     def to_json(self):
-        return {'name': str(self.name),
-                'id': str(self.id),
-                'description': str(self.description),
-                'start_time': str(self.start_time),
-                'days_counter': str(self.days_counter),
-                }
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'start_time': self.start_time.strftime("%Y-%m-%d"),
+            'days_counter': self.days_counter
+        }
 
     @staticmethod
     def from_json(json):
-        global global_id
-        global_id += 1
-        name = json["name"]
-        id = global_id
-        description = json["description"]
-        start_time = DateTime(json["start_time"])
-        days_counter = json["days_counter"]
-        act = Action(name, id, description, start_time, days_counter)
-        return act
+        if "id" in json:
+            oid = json["id"]
+        else:
+            oid = None
+
+        try:
+            name = json["name"]
+            description = json.get("description", "")
+            start_time = datetime.datetime.strptime(json["start_time"], "%Y-%m-%d").date()
+            days_counter = json["days_counter"]
+
+            return Action(oid, name, description, start_time, days_counter)
+
+        except ValueError as err:
+            raise InvalidJson("ValueError: {}".format(err))
+        except KeyError as err:
+            raise InvalidJson("KeyError: {}".format(err))
+
